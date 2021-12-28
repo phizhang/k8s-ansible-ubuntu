@@ -1,0 +1,60 @@
+---
+- name: Update dependent package
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - lsb-release
+    state: present
+
+- name: check if /usr/share/keyrings/docker-archive-keyring.gpg exist
+  stat:
+    path: /usr/share/keyrings/docker-archive-keyring.gpg
+  register: docker_gpg
+
+- name: Add Docker’s official GPG key
+  shell:
+    cmd:
+      curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+  when: docker_gpg.stat.exists == false
+
+- name: check if /etc/apt/sources.list.d/docker.list exist
+  stat:
+    path: /etc/apt/sources.list.d/docker.list
+  register: docker_list
+
+- name: set up the stable repository
+  shell:
+    cmd:
+      echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+  when: docker_list.stat.exists == false
+
+- name: Update repo cache
+  apt:
+    update_cache: yes
+  when: docker_list.stat.exists == false
+
+- name: Install docker engine
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+    state: present
+
+- name: Update insesure registries
+  set_fact:
+    insecure_registries: "{{ insecure_docker_registries }}"
+
+- name: Configure docker daemon
+  template:
+    src: "etc-docker-daemon-json.j2"
+    dest: /etc/docker/daemon.json
+
+- name: Reload docker service
+  service:
+    name: docker
+    enabled: yes
+    state: reloaded

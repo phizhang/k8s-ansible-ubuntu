@@ -1,0 +1,10 @@
+# Kubernetes
+token: kubclu.adaf245adf98123e
+service_cidr: "10.96.0.0/12"
+pod_network_cidr: "10.244.0.0/16"
+kubeadmin_config: "/etc/kubernetes/admin.conf"
+
+
+# External docker registries
+# To be change
+insecure_docker_registries: [IP:port]

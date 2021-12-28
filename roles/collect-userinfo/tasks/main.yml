@@ -1,0 +1,6 @@
+---
+- name: Collect user id
+  set_fact:
+    k8s_user_id: "{{ ansible_user_id }}"
+    k8s_user_gid: "{{ ansible_user_gid }}"
+    k8s_user_home: "{{ ansible_user_dir }}"

@@ -1,0 +1,20 @@
+---
+- name: Check calico daemonset is working
+  shell: kubectl get ds --all-namespaces | grep calico
+  run_once: true
+  register: check_net
+  ignore_errors: true
+  changed_when: false
+
+- name: Create calico network daemonset
+  when: check_net is failed
+  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  run_once: true
+
+- name: Wait for DNS to become available
+  command: kubectl wait --for=condition=ready -n kube-system --timeout=60s pod -l k8s-app=kube-dns
+  run_once: true
+  retries: 5
+  delay: 5
+  register: result
+  until: result is not failed

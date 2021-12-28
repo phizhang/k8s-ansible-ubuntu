@@ -1,0 +1,8 @@
+---
+- hosts: master
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Reset Kubernetes cluster
+      shell: "kubeadm reset --force"
+      ignore_errors: true

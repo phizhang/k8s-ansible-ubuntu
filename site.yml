@@ -1,0 +1,26 @@
+---
+- hosts: master
+  roles:
+    - {role: collect-userinfo, tags: userinfo}
+  
+- hosts: kube_cluster
+  become: yes
+  roles:
+    - {role: pre-cleanup, tags: setup}
+    - {role: docker, tags: setup}
+    - {role: kubernetes/packages, tags: setup}
+
+- hosts: master
+  become: yes
+  gather_facts: yes
+  roles:
+    - {role: kubernetes/master, tags: master}
+
+- hosts: master
+  roles:
+    - {role: cni, tags: cni}
+
+- hosts: worker
+  become: yes
+  roles:
+    - {role: kubernetes/node, tags: node}

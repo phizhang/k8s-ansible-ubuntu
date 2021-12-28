@@ -1,0 +1,9 @@
+[master]
+<server1> ansible_user=<user> ansible_python_interpreter=python3
+
+[worker]
+<server2> ansible_user=<user> ansible_python_interpreter=python3
+
+[kube_cluster:children]
+master
+worker

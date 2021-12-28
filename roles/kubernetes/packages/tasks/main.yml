@@ -1,0 +1,42 @@
+- name: check if /usr/share/keyrings/kubernetes-archive-keyring.gpg
+  stat:
+    path: /usr/share/keyrings/kubernetes-archive-keyring.gpg
+  register: kubernetes_gpg
+
+- name: Add Kubernetes’s official GPG key
+  shell:
+    cmd:
+      sudo curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  when: kubernetes_gpg.stat.exists == false
+
+- name: check if /etc/apt/sources.list.d/kubernetes.list exist
+  stat:
+    path: /etc/apt/sources.list.d/kubernetes.list
+  register: kubernetes_list
+
+- name: set up the stable repository for kubernetes
+  shell:
+    cmd:
+      echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  when: kubernetes_list.stat.exists == false
+
+- name: Update repo cache
+  apt:
+    update_cache: yes
+  when: kubernetes_list.stat.exists == false
+
+- name: Install kubernetes packages
+  apt:
+    name:
+      - kubelet=1.21.7-00
+      - kubeadm=1.21.7-00
+      - kubectl
+    state: present
+
+- name: Disable swap
+  shell: "swapoff -a"
+
+- name: Start kubelet
+  service:
+    name: kubelet
+    state: restarted

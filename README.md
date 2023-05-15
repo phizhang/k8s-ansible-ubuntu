@@ -46,6 +46,8 @@ ansible-playbook reset-site.yml
 
 ## Known issues and fixing
 Issue 1: Kubeadm unknown service runtime.v1alpha2.RuntimeService
+```
 Solution:
 rm /etc/containerd/config.toml
 systemctl restart containerd
+```

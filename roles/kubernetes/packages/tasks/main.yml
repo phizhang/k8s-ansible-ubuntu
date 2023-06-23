@@ -28,8 +28,8 @@
 - name: Install kubernetes packages
   apt:
     name:
-      - kubelet=1.21.7-00
-      - kubeadm=1.21.7-00
+      - kubelet=1.26.0-00
+      - kubeadm=1.26.0-00
       - kubectl
     state: present
 

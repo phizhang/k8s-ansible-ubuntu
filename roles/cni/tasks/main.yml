@@ -8,7 +8,7 @@
 
 - name: Create calico network daemonset
   when: check_net is failed
-  command: kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+  command: kubectl apply -f https://docs.projectcalico.org/archive/v3.23/manifests/calico.yaml
   run_once: true
 
 - name: Wait for DNS to become available
